@@ -297,8 +297,10 @@ switch state
         textstring2 = feval(datalabelformatfcnh,xv2,yv2);
 
         %Add the data label
-        th1 = text(xv1,yv1,textstring1,'FontSize',8,'Tag','CursorText','Parent',axh);
-        th2 = text(xv2,yv2,textstring2,'FontSize',8,'Tag','CursorText','Parent',axh);
+        th1offset = [0 0];   % Default offset for first label from data point ([x y])
+        th2offset = [0 0];          % Default offset for second label from data point ([x y])
+        th1 = text(xv1+th1offset(1),yv1+th1offset(2),textstring1,'FontSize',8,'Tag','CursorText','Parent',axh);
+        th2 = text(xv2+th2offset(1),yv2+th2offset(2),textstring2,'FontSize',8,'Tag','CursorText','Parent',axh);
 
         %For R13 or higher (MATLAB 6.5), use a background color on the text string
         v=ver('MATLAB');
@@ -356,8 +358,8 @@ switch state
         setappdata(ph2,'CursorNumber',2);
         setappdata(th1,'FormatFcnH',datalabelformatfcnh);
         setappdata(th2,'FormatFcnH',datalabelformatfcnh);
-        setappdata(th1,'Offset',[0 0]);     %Offset for the text label from the data value
-        setappdata(th2,'Offset',[0 0]);     %Offset for the text label from the data value
+        setappdata(th1,'Offset',th1offset);     %Offset for the text label from the data value
+        setappdata(th2,'Offset',th2offset);     %Offset for the text label from the data value
 
         %     mh = uicontextmenu('Tag','DeleteObject', ...
         %         'Callback','ud = get(gco,''UserData'');delete([gco ud(2)]);');
