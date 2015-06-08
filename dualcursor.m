@@ -752,7 +752,8 @@ axh = ev.Axes;
 
 % Get axis limits. Pretend limits are a little smaller.  This helps pull
 % cursor in from edge
-xLimits = xlim(axh).*[1.02 .98];
+% xLimits = xlim(axh).*[1.02 .98];
+xLimits = xlim(axh) + diff(xlim(axh))*[.02 -.02];
 
 % Get locations of each cursor
 cursors = findobj(axh,'Tag','Cursor');
