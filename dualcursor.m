@@ -232,7 +232,10 @@ switch state
         if nargin<2 | isempty(deltalabelpos)
             deltalabelpos = [.65 -.08;.9 -.08];            %Use defaults
             %[x1 y1; x2 y2]
-        end;
+        else
+            % Store deltalabelpos for use later
+            setappdata(axh,'DeltaLabelPos',deltalabelpos)
+        end
 
 
         %Marker and color specification
@@ -784,8 +787,21 @@ if xCursors(1)==xCursors(2)
     end
 end
 
+% If deltalabelpos had been originally specified, pass it along.
+% This is probably the tip of the iceberg - I likely need to update the
+% code to store all initial user inputs so that they can be reset after
+% zoom.
+if isappdata(axh, 'DeltaLabelPos') % deltalabelpos is stored here if originally defined
+    deltalabelpos = getappdata(axh,'DeltaLabelPos');
+else
+    deltalabelpos = [];
+end
+
+    
+
+
 % Put cursors in new positions
-dualcursor(xCursors)
+dualcursor(xCursors,deltalabelpos)
 
 
 
