@@ -149,7 +149,8 @@ function val = dualcursor(state,deltalabelpos,marker_color,datalabelformatfcnh,a
 
 if nargin<4 || isempty(datalabelformatfcnh)    %Nope.  Use the default one included here.
     datalabelformatfcnh = @local_maketextstring;
-end;
+end
+
 
 if nargout
     if nargin==0    %Use current axis
@@ -158,24 +159,26 @@ if nargout
         h = state;
         if strcmp(get(h,'Type'),'line');
             h = get(h,'Parent');
-        end;
-    end;
+        end
+    end
     cursors = findobj(h,'Tag','Cursor');
     if length(cursors)==2       %Should be empty (no cursors), or length=2
         for ii=1:2
             cn = getappdata(cursors(ii),'CursorNumber');
             ind = (cn-1)*2+1:cn*2;      %Index into val
             val(ind) = getappdata(cursors(ii),'Coordinates');
-        end;
+        end
     else
         val = [];
         warning('I could not find any cursors');
-    end;
+    end
     return
 elseif nargin<5 || isempty(axh)    %Did the user specify a handle?
     axh = gca;
-end;
+end
 
+% Store data label format function handle
+setappdata(axh,'DataLabelFormatFcn',datalabelformatfcnh)
 
 %If no input arguments, switch state (turn off/on)
 if (nargin==0 & nargout==0) | isempty(state)  %Switch state.  Check current state
@@ -184,8 +187,8 @@ if (nargin==0 & nargout==0) | isempty(state)  %Switch state.  Check current stat
         state = 'on';
     else
         state = 'off';
-    end;
-end;
+    end
+end
 
 %Check if the first argument is numeric.  The user is specifying
 %  the initial x-coordinates of the markers
@@ -195,13 +198,13 @@ if nargin>=1 & isnumeric(state) %First input is x coordinates of markers
     %error check
     if length(x_init)~=2
         error('First input must be 2 element vector of x coordinates');
-    end;
+    end
     state = 'on';       %Turn on data cursors.
 else        %Default position = 1/3, 2/3 x axis limits
     %    xl = xlim;              %X Limits.  this is the letter L, not the number 1
     if strcmp(get(axh,'Type'),'figure') ||  strcmp(get(axh,'Type'),'uipanel') || strcmp(get(axh,'Type'),'root');    %user clicked on the axis itself; do nothing
         return
-    end;
+    end
 
 
     xl = xlim(axh);
@@ -211,7 +214,7 @@ else        %Default position = 1/3, 2/3 x axis limits
     width = diff(xl);     %Axis width
     x_init = xl(1)+[1/3 2/3]*width;
 
-end;
+end
 
 % Get handle to figure just once
 hFig = ancestor(axh,'figure');
@@ -239,7 +242,7 @@ switch state
 
 
         %Marker and color specification
-        if nargin >= 3 ,
+        if nargin >= 3 && ~isempty(marker_color)
             %Parse marker string.  User might specify color, marker, or both
             colors = 'bgrcmyk';
             markers = '+o*.xsdv^><ph';
@@ -251,14 +254,17 @@ switch state
                     mark_ind = strfind(markers,marker_color(ii));
                     if ~isempty(mark_ind)
                         marker = marker_color(ii);
-                    end;
-                end;
-            end;
-        end;
+                    end
+                end
+            end
+            
+            % Store deltalabelpos for use later
+            setappdata(axh,'Marker_Color',marker_color)
+        end
 
         %Handle default marker and color
-        if ~exist('color','var'), color = 'r'; end; %set default
-        if ~exist('marker','var'), marker = '*'; end; %set default
+        if ~exist('color','var'), color = 'r'; end %set default
+        if ~exist('marker','var'), marker = '*'; end %set default
 
         %Add the cursors.
         %Ideally, the user specified the 2 x coordinates.
@@ -289,7 +295,7 @@ switch state
             %Why the last line?  Because it is the first one added
             xl = get(lineh,'XData');
             yl = get(lineh,'YData');
-        end;
+        end
 
         %Find nearest value on the line
         [xv1,yv1] = local_nearest(x_init(1),xl,yl);
@@ -311,7 +317,7 @@ switch state
         if v>=6.5
             set(th1,'BackgroundColor','y');
             set(th2,'BackgroundColor','y');
-        end;
+        end
 
         yl = ylim(axh);
         lim = localObjbounds(axh);
@@ -422,7 +428,7 @@ switch state
 %             set(gco,'EraseMode','xor')
             set(gcf,'WindowButtonMotionFcn','dualcursor(''move'',[],[],[],get(gco,''Parent''))', ...
                 'WindowButtonUpFcn','dualcursor(''up'',[],[],[],get(gco,''Parent''))');
-        end;
+        end
 
         if strcmp(tag,'Cursor') %If clicked on a cursor
             %Label the cursor we are moving.  Add a text label just above the plot
@@ -453,7 +459,7 @@ switch state
             v=str2num(v.Version);
             if v>=6.5
                 set(CNh,'BackgroundColor','c');
-            end;
+            end
             setappdata(gco,'CNh',CNh);
 
         end
@@ -479,7 +485,7 @@ switch state
                 set(gco,'Position', [pt 0])
                 drawnow
                 return
-            end;
+            end
 
             %Is this the cursor or the text
             if strcmp(tag,'CursorText')             %The text
@@ -492,7 +498,7 @@ switch state
                 handles = get(gco,'UserData');
                 th = handles(2);
                 slide = 1;      %Slide along line to next data point
-            end;
+            end
 
             offset = getappdata(th,'Offset');       %Offset from data value
 
@@ -526,7 +532,7 @@ switch state
                     xlm(isinf(xlm)) = lim(isinf(xlm));
                     xn = (xv - xlm(1))/(xlm(2)-xlm(1));
                     set(CNh,'Position',[xn pos(2:3)])
-                end;
+                end
 
                 yl = ylim(axh);
                 lim = localObjbounds(get(lh,'Parent'));
@@ -548,7 +554,7 @@ switch state
                     temp = cursors(1);
                     cursors(1) = cursors(2);
                     cursors(2) = temp;
-                end;
+                end
 
 
                 deltah = getappdata(axh,'Delta_Handle');    %Handle to cursors
@@ -567,9 +573,9 @@ switch state
 
             else                %Just move text around.
                 set(th,'Position', [x y 0])
-            end;
+            end
             drawnow
-        end;
+        end
 
     case 'up'           % Execute the WindowButtonUpFcn
         htype = get(gco,'Type');
@@ -586,15 +592,15 @@ switch state
                 offset(1) = pt(1) - coords(1);
                 offset = pt - coords;
                 setappdata(gco,'Offset',offset);
-            end;
+            end
 
 
             if strcmp(tag,'Cursor')        %Delete the temporary cursor number label
                 CNh = getappdata(gco,'CNh');
                 delete(CNh);
-            end;
+            end
 
-        end;
+        end
         
     case 'selectline'          % User selected a new line to be active
         %Make the selected line bold
@@ -677,7 +683,7 @@ switch state
         if length(xd)==1
             xd = xd{1};
             yd = yd{1};
-        end;
+        end
 
         cursors.xd = xd;
         cursors.yd = yd;
@@ -734,7 +740,7 @@ switch state
         set(lineh,'ButtonDownFcn','');
 
         %         erasemode = getappdata(axh,'OriginalEraseMode');
-        %         if isempty(erasemode), erasemode = 'normal'; end;   %handles first time
+        %         if isempty(erasemode), erasemode = 'normal'; end   %handles first time
         %         set(local_findlines(axh),'EraseMode',erasemode);
 
         delete([h1;h2;h3]);
@@ -797,12 +803,16 @@ else
     deltalabelpos = [];
 end
 
-    
+if isappdata(axh, 'Marker_Color') % Marker_Color is stored here if originally defined
+    marker_color = getappdata(axh,'Marker_Color');
+else
+    marker_color = [];
+end
 
+datalabelformatfcnh = getappdata(axh,'DataLabelFormatFcn');
 
 % Put cursors in new positions
-dualcursor(xCursors,deltalabelpos)
-
+dualcursor(xCursors,deltalabelpos,marker_color,datalabelformatfcnh)
 
 
 end
@@ -829,12 +839,12 @@ else
     %Find nearest x value only.
     c = abs(xln - xn);
 
-    [junk,ind] = min(c);
+    [~,ind] = min(c);
 
     %Nearest value on the line
     xv = xl(ind);
     yv = yl(ind);
-end;
+end
 end
 
 function textstring = local_maketextstring(xv,yv)
@@ -864,7 +874,7 @@ x2ind = zeros(Nl,1);
 if Nl==1
     xd= {xd};
     yd = {yd};
-end;
+end
 
 for ii = 1:Nl
     x1ind(ii) = max(find(xd{ii}<=val(1)));
@@ -878,7 +888,7 @@ for ii = 1:Nl
     hgS(ii).properties.XData = xd{ii};
     hgS(ii).properties.YData = yd{ii};
 
-end;
+end
 end
 
 function lineh = local_findlines(axh);
@@ -893,16 +903,16 @@ linehtemp = lineh;
 lineh=[];
 if ~iscell(xdtemp)      %If there's only one line, force data into a cell array
     xdtemp = {xdtemp};
-end;
-
-for ii=1:length(xdtemp);
-    if length(xdtemp{ii})>2
-        lineh = [lineh; linehtemp(ii)];
-    end;
-end;
 end
 
-function lim = localObjbounds(axh);
+for ii=1:length(xdtemp)
+    if length(xdtemp{ii})>2
+        lineh = [lineh; linehtemp(ii)];
+    end
+end
+end
+
+function lim = localObjbounds(axh)
 % Get x limits of all data in axes axh
 kids = get(axh,'Children');
 xmin = Inf; xmax = -Inf;
