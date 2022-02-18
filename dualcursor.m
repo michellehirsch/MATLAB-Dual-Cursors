@@ -665,9 +665,9 @@ switch state
         %Update delta calculation
         deltah = getappdata(axh,'Delta_Handle');    %Handle to delta calculation
 
-        %                 %Positions of two dualcursors
-        xy1 = getappdata(cursors(1),'Coordinates');
-        xy2 = getappdata(cursors(2),'Coordinates');
+        % Update positions of two dualcursors
+        setappdata(cursors(cn1),'Coordinates',[xv1 yv1]); %REVISED CODE
+        setappdata(cursors(cn2),'Coordinates',[xv2 yv2]); %REVISED CODE
 
         %Calculate Difference
         dx = xv2 - xv1;
