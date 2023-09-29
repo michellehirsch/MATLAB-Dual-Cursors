@@ -157,7 +157,7 @@ if nargout
         h = gca;
     else
         h = state;
-        if strcmp(get(h,'Type'),'line');
+        if strcmp(get(h,'Type'),'line')
             h = get(h,'Parent');
         end
     end
@@ -166,7 +166,7 @@ if nargout
         for ii=1:2
             cn = getappdata(cursors(ii),'CursorNumber');
             ind = (cn-1)*2+1:cn*2;      %Index into val
-            val(ind) = getappdata(cursors(ii),'Coordinates');
+            val(ind) = getappdata(cursors(ii),'Coordinates'); %#ok<*AGROW> 
         end
     else
         val = [];
@@ -181,7 +181,7 @@ end
 setappdata(axh,'DataLabelFormatFcn',datalabelformatfcnh)
 
 %If no input arguments, switch state (turn off/on)
-if (nargin==0 & nargout==0) | isempty(state)  %Switch state.  Check current state
+if (nargin==0 && nargout==0) || isempty(state)  %Switch state.  Check current state
     dots = findobj(axh,'Type','line','Tag','Cursor');  %See if there are any cursors
     if isempty(dots)    %None found.  Turn cursors on
         state = 'on';
@@ -192,7 +192,7 @@ end
 
 %Check if the first argument is numeric.  The user is specifying
 %  the initial x-coordinates of the markers
-if nargin>=1 & isnumeric(state) %First input is x coordinates of markers
+if nargin>=1 && isnumeric(state) %First input is x coordinates of markers
     x_init = state(:);
 
     %error check
@@ -202,7 +202,7 @@ if nargin>=1 & isnumeric(state) %First input is x coordinates of markers
     state = 'on';       %Turn on data cursors.
 else        %Default position = 1/3, 2/3 x axis limits
     %    xl = xlim;              %X Limits.  this is the letter L, not the number 1
-    if strcmp(get(axh,'Type'),'figure') ||  strcmp(get(axh,'Type'),'uipanel') || strcmp(get(axh,'Type'),'root');    %user clicked on the axis itself; do nothing
+    if strcmp(get(axh,'Type'),'figure') ||  strcmp(get(axh,'Type'),'uipanel') || strcmp(get(axh,'Type'),'root')    %user clicked on the axis itself; do nothing
         return
     end
 
@@ -232,7 +232,7 @@ switch state
         %Parse user inputs
 
         %Check for user input of position for delta labels
-        if nargin<2 | isempty(deltalabelpos)
+        if nargin<2 || isempty(deltalabelpos)
             deltalabelpos = [.65 -.08;.9 -.08];            %Use defaults
             %[x1 y1; x2 y2]
         else
@@ -562,6 +562,7 @@ switch state
                 %Positions of two dualcursors
                 xy1 = getappdata(cursors(1),'Coordinates');
                 xy2 = getappdata(cursors(2),'Coordinates');
+
 
 
                 %Calculate Difference
